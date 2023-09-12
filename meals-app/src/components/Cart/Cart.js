@@ -12,13 +12,19 @@ export default function Cart(props) {
 
     const cartCtx = useContext(CartContext);
 
-    const cartItemRemoveHandler = od => {};
-    const catrItemAddHandler = item => {};
+    const cartItemRemoveHandler = id => {
+      cartCtx.removeItem(id)
+    };
+    const catrItemAddHandler = item => {
+      cartCtx.addItem({...item, amount: 1})
+    };
     const cartItems = (
         <ul className={classes['cart-items']}>
           {cartCtx.items.map((item) => 
           (
-            <CartItem ket={item.id} name={item.name} amount={item.amount} price={item.price} onRemove={cartItemRemoveHandler.bind(null,item.id)} onAdd={catrItemAddHandler.bind(null, item)} />
+            <CartItem ket={item.id} name={item.name} amount={item.amount} price={item.price} 
+            onRemove={cartItemRemoveHandler.bind(null,item.id)} 
+            onAdd={catrItemAddHandler.bind(null, item)} />
           ))}
         </ul>
     )
