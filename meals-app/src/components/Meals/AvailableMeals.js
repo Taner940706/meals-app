@@ -7,6 +7,9 @@ import MealItem from './MealItem/MealItem';
 
 export default function AvailableMeals() {
 
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchMeals = async () => {
       const response = await fetch('https://console.firebase.google.com/project/meals-app-bc976/database/meals-app-bc976-default-rtdb/data/~2F.meals.js')
@@ -18,12 +21,22 @@ export default function AvailableMeals() {
           id: key,
           name: responseData[key].name,
           description: responseData[key].description,
-          price: responseData[key].price
-
-        })
+          price: responseData[key].price,
+        });
       }
-    }
-  }, [])
+      setMeals(loadMeals);
+      setLoading(false);
+    };
+    fetchMeals()
+  }, []);
+
+  if (loading){
+    return (
+      <section className={classes.MealsLoading}>
+        <p>Loading...</p>
+      </section>
+    )
+  }
     const mealList = DUMMY_MEALS.map(meal => <MealItem id={meal.id} key={meal.id} name={meal.name} description={meal.description} price={meal.price} />);
 
   return (
