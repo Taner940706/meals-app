@@ -9,11 +9,16 @@ export default function AvailableMeals() {
 
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [httpError, SetHttpError] = useState();
 
   useEffect(() => {
     const fetchMeals = async () => {
       const response = await fetch('https://console.firebase.google.com/project/meals-app-bc976/database/meals-app-bc976-default-rtdb/data/~2F.meals.js')
       const responseData = await response.json();
+
+      if (!response.ok){
+        throw new Error("Something went wrong!")
+      }
 
       const loadMeals = []
       for (const key in responseData){
@@ -26,14 +31,26 @@ export default function AvailableMeals() {
       }
       setMeals(loadMeals);
       setLoading(false);
-    };
-    fetchMeals()
+    }; 
+      fetchMeals().catch((error) => {
+        setLoading(false);
+        SetHttpError(error.message);
+      })
+    
   }, []);
 
   if (loading){
     return (
       <section className={classes.MealsLoading}>
         <p>Loading...</p>
+      </section>
+    )
+  }
+
+  if (httpError){
+    reyrn (
+      <section className={MealsError}>
+        <p>{httpError}</p>
       </section>
     )
   }
