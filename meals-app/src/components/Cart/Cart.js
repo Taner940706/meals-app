@@ -8,7 +8,9 @@ import Checkout from './Checkout'
 
 export default function Cart(props) {
 
-    const [isCheckout, SetIsCheckout] = useState(false)
+    const [isCheckout, SetIsCheckout] = useState(false);
+    const [isSubmitting , setIsSubmitting] = useState(false);
+    const [didSubmitting , setDidSubmitting] = useState(false);
 
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
     const hasItems = cartCtx.items.length >0;
@@ -19,9 +21,9 @@ export default function Cart(props) {
       SetIsCheckout(true);
     }
 
-    const submitOrderHandler = (userData) => {
-
-      fetch("https://meals-app-bc976-default-rtdb.europe-west1.firebasedatabase.app/.orders.json", {
+    const submitOrderHandler = async (userData) => {
+      setIsSubmitting(true);
+      await fetch("https://meals-app-bc976-default-rtdb.europe-west1.firebasedatabase.app/.orders.json", {
         method: 'POST',
         body: JSON.stringify({
           user: userData,
@@ -30,6 +32,8 @@ export default function Cart(props) {
         })
       });
 
+      setIsSubmitting(false);
+      setDidSubmitting(true);
     };
 
     const cartItemRemoveHandler = id => {
@@ -48,18 +52,25 @@ export default function Cart(props) {
           ))}
         </ul>
     )
+
+    const cartModalContent = <>{cartItems}
+    <div className={classes.total}>
+      <span>Total Amount</span>
+      <span>{totalAmount}</span>
+    </div>
+    {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={onClose} />}
+    {!isCheckout && <div className={classes.actions}>
+      <button className={classes['button--alt']} onClick={props.onClose}>Close</button>
+      {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
+    </div>}</>
+
+    const isSubmittingModalContent = <p>Sending order data...</p>;
+    const didSubmitModalContent = <p>Succesfully sent the order!</p>
   return (
     <Modal onClose={props.onClose}>
-      {cartItems}
-      <div className={classes.total}>
-        <span>Total Amount</span>
-        <span>{totalAmount}</span>
-      </div>
-      {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={onClose} />}
-      {!isCheckout && <div className={classes.actions}>
-        <button className={classes['button--alt']} onClick={props.onClose}>Close</button>
-        {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
-      </div>}
+      {!isSubmitting && !didSubmitting && cartModalContent}
+      {isSubmitting && isSubmittingModalContent}
+      {!isSubmitting && didSubmitting && didSubmitModalContent}
     </Modal>
   )
 }
