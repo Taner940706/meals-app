@@ -19,6 +19,19 @@ export default function Cart(props) {
       SetIsCheckout(true);
     }
 
+    const submitOrderHandler = (userData) => {
+
+      fetch("https://meals-app-bc976-default-rtdb.europe-west1.firebasedatabase.app/.orders.json", {
+        method: 'POST',
+        body: JSON.stringify({
+          user: userData,
+          orderedItems: cartCtx.items
+
+        })
+      });
+
+    };
+
     const cartItemRemoveHandler = id => {
       cartCtx.removeItem(id)
     };
@@ -42,7 +55,7 @@ export default function Cart(props) {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {isCheckout && <Checkout onCancel={onClose} />}
+      {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={onClose} />}
       {!isCheckout && <div className={classes.actions}>
         <button className={classes['button--alt']} onClick={props.onClose}>Close</button>
         {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
